@@ -1,0 +1,73 @@
+name: Build/Test/Release
+
+on:
+  push:
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    name: test ${{ matrix.platforms.target }} on ${{ matrix.platforms.os }} static - ${{ matrix.static }}
+    strategy:
+      matrix:
+        static: [true, false]
+        platforms: [
+          {os: ubuntu-22.04, target: x86_64-unknown-linux-gnu},
+          {os: ubuntu-22.04, target: aarch64-unknown-linux-gnu},
+          {os: ubuntu-22.04, target: armv7-unknown-linux-gnueabihf},
+          {os: ubuntu-22.04, target: armv7-unknown-linux-gnueabi},
+          {os: macos-13, target: aarch64-apple-darwin},
+          {os: macos-13, target: x86_64-apple-darwin},
+          {os: windows-2022, target: x86_64-pc-windows-msvc},
+        ]
+    runs-on: ${{ matrix.platforms.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - uses: ilammy/setup-nasm@v1
+      if : ${{ matrix.platforms.os == 'windows-2022' }}
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+        components: rustfmt, clippy
+    - name: Run cargo fmt
+      run: cargo fmt --all -- --check
+    - name: Run cargo check
+      run: cargo check --all --all-features
+    - name: Run cargo clippy
+      run: cargo clippy --all --all-features -- -D warnings
+    - name: Run cargo test on Linux
+      if: ${{ matrix.platforms.os == 'ubuntu-22.04' }}
+      run: cargo test --all --all-features
+    - name: Run cargo test on non LInux
+      env: # this is a bit counter intuitive - some tests relies on Docker to run and are marked not(ci), but macos runner doesn't have Docker installed, so we make it "ci" to bypass those tests 
+        CLASH_RS_CI: 'true'
+      if: ${{ matrix.platforms.os != 'ubuntu-22.04' }}
+      run: cargo test --all --all-features
+    - name: Build artifacts
+      run: sh ./scripts/build.sh "${{ matrix.platforms.target }}" "${{ matrix.static }}"
+    - name: Stash artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: clash-${{ matrix.platforms.os }}-${{ matrix.platforms.target }}-${{ matrix.static }}
+        path: target/artifacts/
+
+
+    - name: Create Release
+      if: contains(github.ref, 'tags/v')
+      id: create_release
+      uses: softprops/action-gh-release@v2        
+      with:
+        generate_release_notes: true
+    - name: Upload Release Asset
+      if: contains(github.ref, 'tags/v')
+      id: upload-release-asset 
+      uses: dwenegar/upload-release-assets@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ steps.create_release.outputs.id }}
+        assets_path: target/artifacts
