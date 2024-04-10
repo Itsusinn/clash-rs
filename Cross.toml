@@ -1,0 +1,4 @@
+
+[build]
+zig = "2.17"
+# pre-build = "./.github/prebuild.sh"
