@@ -96,7 +96,7 @@ jobs:
 
       - name: Cargo test
         uses: clechasseur/rs-cargo@v2
-        if: startsWith(matrix.os, 'ubuntu')
+        if: ${{ startsWith(matrix.os, 'ubuntu') && !matrix.build-std }}
         with:
           use-cross: ${{ matrix.cross }}
           command: test
@@ -107,7 +107,7 @@ jobs:
 
       - name: Cargo test (no docker test)
         uses: clechasseur/rs-cargo@v2
-        if: ${{ !startsWith(matrix.os, 'ubuntu') }}
+        if: ${{ !startsWith(matrix.os, 'ubuntu') && !matrix.build-std }}
         with:
           use-cross: ${{ matrix.cross }}
           command: test
