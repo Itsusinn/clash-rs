@@ -38,7 +38,7 @@ jobs:
           #   rustflags: ""
 
           - os: ubuntu-latest
-            target: mips-unknown-linux-musl
+            target: mipsel-unknown-linux-musl
             cross: true
             extra-args: "--all-features -Z build-std=core,alloc,std"
             build-std: true
