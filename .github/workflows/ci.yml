@@ -40,6 +40,7 @@ jobs:
             target: mips-unknown-linux-musl
             cross: true
             extra-args: "--all-features -Zbuild-std"
+            build-std: true
             components: "rust-src"
             toolchain: "nightly-2024-04-01"
             rustflags: "--cfg tokio_unstable"
@@ -64,13 +65,20 @@ jobs:
             ${{ matrix.release-name || matrix.target }}
 
       - uses: dtolnay/rust-toolchain@master
+        if: ${{ !matrix.build-std }}
         with:
           toolchain: ${{ matrix.toolchain || 'stable' }}
           target: ${{ matrix.target }}
           components: ${{ matrix.components || 'rustfmt, clippy' }}
+      - uses: dtolnay/rust-toolchain@master
+        if: ${{ matrix.build-std }}
+        with:
+          toolchain: ${{ matrix.toolchain || 'nightly' }}
+          components: ${{ matrix.components || 'rust-src' }}
 
       - name: Cargo fmt
         uses: clechasseur/rs-cargo@v2
+        if: ${{ !matrix.build-std }}
         with:
           use-cross: ${{ matrix.cross }}
           command: fmt
@@ -78,6 +86,7 @@ jobs:
 
       - name: Cargo clippy
         uses: clechasseur/rs-cargo@v2
+        if: ${{ !matrix.build-std }}
         with:
           use-cross: ${{ matrix.cross }}
           command: clippy
