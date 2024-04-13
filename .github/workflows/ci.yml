@@ -13,6 +13,7 @@ concurrency:
 
 env:
   PACKAGE: "clash"
+  RUST_BACKTRACE: 1
 
 jobs:
   compile:
