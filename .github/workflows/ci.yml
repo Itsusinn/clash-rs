@@ -39,7 +39,7 @@ jobs:
           - os: ubuntu-latest
             target: mips-unknown-linux-musl
             cross: true
-            extra-args: "--all-features -Z build-std=core, std, alloc"
+            extra-args: "--all-features -Z build-std=core,alloc,std"
             build-std: true
             toolchain: "nightly-2024-04-01"
             rustflags: "--cfg tokio_unstable"
