@@ -231,6 +231,8 @@ jobs:
         env:
           CLASH_RS_CI: "true"
           RUSTFLAGS: ${{ matrix.rustflags || '--cfg tokio_unstable' }}
+          GITHUB_REF: ${{ env.GITHUB_REF }}
+          GITHUB_SHA: ${{ env.GITHUB_SHA }}
 
       - name: Cargo build
         uses: clechasseur/rs-cargo@v2
