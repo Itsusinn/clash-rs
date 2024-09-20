@@ -231,8 +231,6 @@ jobs:
         env:
           CLASH_RS_CI: "true"
           RUSTFLAGS: ${{ matrix.rustflags || '--cfg tokio_unstable' }}
-          GITHUB_REF: "refs/heads/master"
-          GITHUB_SHA: ${{ env.GITHUB_SHA }}
 
       - name: Cargo build
         uses: clechasseur/rs-cargo@v2
@@ -242,6 +240,8 @@ jobs:
           args: --release --target ${{ matrix.target }} ${{ matrix.extra-args }}
         env:
           RUSTFLAGS: ${{ matrix.rustflags || '--cfg tokio_unstable' }}
+          GITHUB_REF: "refs/heads/master"
+          GITHUB_SHA: ${{ env.GITHUB_SHA }}
 
       - name: Rename binary
         run: mv target/${{ matrix.target }}/release/clash-rs${{ matrix.postfix }} ${{ env.PACKAGE }}-${{ matrix.release-name || matrix.target }}${{ matrix.postfix }}
