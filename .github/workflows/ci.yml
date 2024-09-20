@@ -240,8 +240,6 @@ jobs:
           args: --release --target ${{ matrix.target }} ${{ matrix.extra-args }}
         env:
           RUSTFLAGS: ${{ matrix.rustflags || '--cfg tokio_unstable' }}
-          GITHUB_REF: ${{ github.ref }}
-          GITHUB_SHA: ${{ github.sha }}
 
       - name: Rename binary
         run: mv target/${{ matrix.target }}/release/clash-rs${{ matrix.postfix }} ${{ env.PACKAGE }}-${{ matrix.release-name || matrix.target }}${{ matrix.postfix }}
