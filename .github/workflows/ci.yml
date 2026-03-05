@@ -6,7 +6,6 @@ on:
     branches: ["master"]
   pull_request:
     branches: ["master"]
-  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -46,3 +45,4 @@ jobs:
       binary-dir: './packages'
       server-binary-amd64: 'clash-rs-x86_64-unknown-linux-musl'
       server-binary-arm64: 'clash-rs-aarch64-unknown-linux-musl'
+
